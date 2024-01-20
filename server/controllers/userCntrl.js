@@ -60,12 +60,12 @@ export const getAllBookings = asynHandler(async (req, res) => {
 
 // Function to Cancel an already made booking
 
-export const cancelBoooking = asynHandler(async (req, res) => {
+export const cancelBooking = asynHandler(async (req, res) => {
   const { email } = req.body;
   const { id } = req.params;
   try {
     const user = await prisma.user.findUnique({
-      email: { email: email },
+      where: { email: email },
       select: { bookedVisits: true },
     });
     const index = user.bookedVisits.findIndex((visit) => visit.id === id);
@@ -74,13 +74,66 @@ export const cancelBoooking = asynHandler(async (req, res) => {
       res.status(404).json({ message: "Booking Not Found" });
     } else {
       user.bookedVisits.splice(index, 1);
-      await prisma.user.update ({
-        where: {email},
+      await prisma.user.update({
+        where: { email },
         data: {
-            bookedVisits: user.bookedVisits
-        }
-      })
+          bookedVisits: user.bookedVisits,
+        },
+      });
+      res.send("Booking Cancelled Successfully");
     }
+  } catch (err) {
+    throw new Error(err.message);
+  }
+});
+
+// Function to Add a residency as a Favourite {Usage of a single function to add and reomve from favourites of a user}
+
+export const toFav = asynHandler(async (req, res) => {
+  const { email } = req.body;
+  const { rid } = req.params;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+    if (user.favResidenciesID.includes(rid)) {
+      const updateUser = await prisma.user.update({
+        where: { email },
+        data: {
+          favResidenciesID: {
+            set: user.favResidenciesID.filter((id) => id !== rid),
+          },
+        },
+      });
+      res.send({ message: "Removed from Your Favourites", user: updateUser });
+    } else {
+      const updateUser = await prisma.user.update({
+        where: { email },
+        data: {
+          favResidenciesID: {
+            push: rid,
+          },
+        },
+      });
+
+      res.send({ message: "Updated your Favourites List", user: updateUser });
+    }
+  } catch (err) {
+    throw new Error(err.message);
+  }
+});
+
+//Function to get all the favourties
+
+export const getAllFavourites = asynHandler(async (req, res) => {
+  const { email } = req.body;
+  try {
+    const favResd = await prisma.user.findUnique({
+      where: { email },
+      select: { favResidenciesID: true },
+    });
+    res.status(200).send(favResd);
   } catch (err) {
     throw new Error(err.message);
   }
