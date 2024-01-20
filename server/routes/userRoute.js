@@ -1,5 +1,12 @@
-import express from 'express';
+import express from "express";
+import { createUser, bookVisit, getAllBookings } from "../controllers/userCntrl.js";
 
-const router = express.Router()
 
-router.post ("/register", createUser)
+
+const router = express.Router();
+
+router.post("/register", createUser);
+router.post("/bookVisit/:id", bookVisit);
+router.post("/allBookings", getAllBookings);
+
+export { router as userRoute };
