@@ -4,11 +4,11 @@
   "main": "index.js",
   "license": "MIT",
   "type": "module",
-
   "scripts": {
     "start": "nodemon index.js"
   },
   "dependencies": {
+    "@auth0/auth0-react": "^2.2.4",
     "@prisma/client": "^5.8.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
