@@ -4,9 +4,13 @@ import { BiMenuAltRight } from "react-icons/bi";
 import { useState } from "react";
 import OutsideClickHandler from "react-outside-click-handler";
 import { Link, NavLink } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Header = () => {
   const [menuOpened, setMenuOpened] = useState(false);
+
+  const { loginWithRedirect, isAuthenticated, user, logout } = useAuth0();
+
 
   const getMenuStyles = (menuOpened) => {
     if (document.documentElement.clientWidth < 800)
@@ -16,22 +20,27 @@ const Header = () => {
     <section className="h-wrapper">
       <div className="flexCenter paddings innerWidth h-container">
         <Link to="/">
-        <img src="./logo.png" alt="logo" width={100} />
+          <img src="./logo.png" alt="logo" width={100} />
         </Link>
 
-        <OutsideClickHandler 
-        onOutsideClick = {() => {
-        setMenuOpened(false)
-        }}
+        <OutsideClickHandler
+          onOutsideClick={() => {
+            setMenuOpened(false);
+          }}
         >
           <div className="flexCenter h-menu" style={getMenuStyles(menuOpened)}>
             <NavLink to="/properties">Properties</NavLink>
-         
-              <a href="">Contact</a>
+
+            <a href="">Contact</a>
             {/*login button*/}
-            <button className="button">
-              Login
-            </button>
+            {
+              !isAuthenticated ?
+              <button className="button" onClick={loginWithRedirect}>Login
+              </button> :
+              <div>
+                User Profile
+              </div>
+            }
           </div>
         </OutsideClickHandler>
         <div
